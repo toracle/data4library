@@ -1,6 +1,7 @@
 import requests
 
 from data4library.utils import to_camel_case
+from data4library.entities import Library
 
 
 class Client:
@@ -23,6 +24,9 @@ class Client:
         response = requests.get(url, params)
         return response
 
-    def search_library(self):
+    def get_libraries(self):
         response = self.send('libSrch')
-        return response
+        return [
+            Library.read(lib['lib'])
+            for lib in response.json()['response']['libs']
+        ]
