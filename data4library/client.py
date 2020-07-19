@@ -9,6 +9,46 @@ from data4library.entities import (
 )
 
 
+class Paginator:
+    def __init__(self, client, action, params=None, page_size=10):
+        '''
+        :param client: a client
+        :type client: Client
+        :param action: an action name
+        :type action: str
+        :param params: parameters
+        :type params: dict
+        '''
+        self.client = client
+        self.page = 1
+        self.action = action
+        self.params = params or {}
+        self.page_size = page_size
+
+    def __iter__(self):
+        while True:
+            if not self.page:
+                return
+
+            response = self.client.send(self.action,
+                                        page_no=self.page,
+                                        page_size=self.page_size,
+                                        **self.params)
+            yield response
+
+            if response.get('pageNo') == self.page:
+                return
+            self.update_page(response)
+
+    def update_page(self, response):
+        result_num = response['resultNum']
+        if result_num < self.page_size:
+            self.page = None
+            return
+
+        self.page += 1
+
+
 class Client:
     base_url = 'http://data4library.kr/api'
 
@@ -19,7 +59,7 @@ class Client:
     def send(self, action, **options):
         url = f'{self.base_url}/{action}'
         params = {
-            'auth_key': self.api_key,
+            'authKey': self.api_key,
             'format': 'json',
             **{
                 to_camel_case(k): v
@@ -30,11 +70,10 @@ class Client:
         return response.json()['response']
 
     def get_libraries(self):
-        response = self.send('libSrch')
-        return [
-            make_entity(Library, lib['lib'])
-            for lib in response['libs']
-        ]
+        paginator = Paginator(self, 'libSrch')
+        for page in paginator:
+            for lib in page['libs']:
+                yield make_entity(Library, lib['lib'])
 
     def get_book_detail(self, isbn13):
         response = self.send('srchDtlList',
@@ -43,8 +82,7 @@ class Client:
         return make_entity(Book, response['detail'][0]['book'])
 
     def get_popular_loans(self):
-        response = self.send('loanItemSrch')
-        return [
-            make_entity(PopularLoan, doc['doc'])
-            for doc in response['docs']
-        ]
+        paginator = Paginator(self, 'loanItemSrch', page_size=300)
+        for page in paginator:
+            for doc in page['docs']:
+                yield make_entity(PopularLoan, doc['doc'])

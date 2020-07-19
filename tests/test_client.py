@@ -1,4 +1,6 @@
 import json
+
+from data4library.utils import to_camel_case
 from .conftest import read_fixture
 
 
@@ -21,7 +23,7 @@ def test_get_libraries(requests_mock, client):
         text=read_fixture('search_libraries_response.txt')
     )
 
-    libs = client.get_libraries()
+    libs = list(client.get_libraries())
     assert len(libs) == 10
 
 
@@ -42,6 +44,6 @@ def test_get_popular_loans(requests_mock, client):
         text=read_fixture('get_popular_loans_response.txt')
     )
 
-    loans = client.get_popular_loans()
+    loans = list(client.get_popular_loans())
     assert loans
     assert len(loans) == 200
