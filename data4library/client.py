@@ -9,6 +9,10 @@ from data4library.entities import (
 )
 
 
+class ClientException(Exception):
+    pass
+
+
 class Paginator:
     def __init__(self, client, action, params=None, page_size=10):
         '''
@@ -67,7 +71,14 @@ class Client:
             }
         }
         response = requests.get(url, params)
-        return response.json()['response']
+        if response.status_code != 200:
+            raise ClientException(response.content)
+
+        content = response.json()
+        if 'error' in content['response']:
+            raise ClientException(content['response']['error'])
+
+        return content['response']
 
     def get_libraries(self):
         paginator = Paginator(self, 'libSrch')
