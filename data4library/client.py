@@ -1,7 +1,10 @@
 import requests
 
 from data4library.utils import to_camel_case
-from data4library.entities import Library
+from data4library.entities import (
+    Book,
+    Library,
+)
 
 
 class Client:
@@ -22,11 +25,17 @@ class Client:
             }
         }
         response = requests.get(url, params)
-        return response
+        return response.json()['response']
 
     def get_libraries(self):
         response = self.send('libSrch')
         return [
             Library.read(lib['lib'])
-            for lib in response.json()['response']['libs']
+            for lib in response['libs']
         ]
+
+    def get_book_detail(self, isbn13):
+        response = self.send('srchDtlList',
+                             isbn13=isbn13,
+                             loaninfoYN='N')
+        return Book.read(response['detail'][0]['book'])

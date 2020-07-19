@@ -54,3 +54,34 @@ class Library:
         }
 
         return map_dict_to_entity(Library, data, mapping)
+
+
+@dataclass
+class Book:
+    isbn: str
+    isbn13: str
+    name: str
+    publication_year: str
+    publication_date: str
+    authors: str
+    publisher: str
+    class_no: str
+    image_url: str
+    description: str
+
+    @staticmethod
+    def read(data):
+        mapping = {
+            'isbn': 'isbn',
+            'isbn13': 'isbn13',
+            'bookname': 'name',
+            'publication_year': 'publication_year',
+            'publication_date': 'publication_date',
+            'authors': 'authors',
+            'publisher': 'publisher',
+            'class_no': 'class_no',
+            'bookImageURL': 'image_url',
+            'description': 'description',
+        }
+
+        return map_dict_to_entity(Book, data, mapping)
