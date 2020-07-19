@@ -2,7 +2,50 @@ from dataclasses import dataclass
 from dataclasses import fields
 
 
-def map_dict_to_entity(clazz, data, mapping):
+DICT_TO_ENTITY_MAP = {
+    'Library': {
+        'libCode': 'code',
+        'libName': 'name',
+        'address': 'address',
+        'BookCount': 'book_count',
+        'closed': 'closed',
+        'fax': 'fax',
+        'homepage': 'homepage',
+        'latitude': ('latitude', float),
+        'longitude': ('longitude', float),
+        'operatingTime': 'operating_time',
+        'tel': 'tel',
+    },
+    'Book': {
+        'isbn': 'isbn',
+        'isbn13': 'isbn13',
+        'bookname': 'name',
+        'publication_year': 'publication_year',
+        'publication_date': 'publication_date',
+        'authors': 'authors',
+        'publisher': 'publisher',
+        'class_no': 'class_no',
+        'bookImageURL': 'image_url',
+        'description': 'description',
+    },
+    'PopularLoan': {
+        'ranking': 'ranking',
+        'bookname': 'name',
+        'authors': 'authors',
+        'publisher': 'publisher',
+        'publication_year': 'publication_year',
+        'vol': 'vol',
+        'isbn13': 'isbn13',
+        'class_no': 'class_no',
+        'loan_count': 'loan_count',
+        'bookImageURL': 'image_url',
+    }
+}
+
+
+def make_entity(clazz, data):
+    mapping = DICT_TO_ENTITY_MAP.get(clazz.__name__)
+
     initials = {}
     for from_field_name, field_value in data.items():
         if from_field_name not in mapping:
@@ -37,24 +80,6 @@ class Library:
     operating_time: str
     tel: str
 
-    @staticmethod
-    def read(data):
-        mapping = {
-            'libCode': 'code',
-            'libName': 'name',
-            'address': 'address',
-            'BookCount': 'book_count',
-            'closed': 'closed',
-            'fax': 'fax',
-            'homepage': 'homepage',
-            'latitude': ('latitude', float),
-            'longitude': ('longitude', float),
-            'operatingTime': 'operating_time',
-            'tel': 'tel',
-        }
-
-        return map_dict_to_entity(Library, data, mapping)
-
 
 @dataclass
 class Book:
@@ -69,19 +94,16 @@ class Book:
     image_url: str
     description: str
 
-    @staticmethod
-    def read(data):
-        mapping = {
-            'isbn': 'isbn',
-            'isbn13': 'isbn13',
-            'bookname': 'name',
-            'publication_year': 'publication_year',
-            'publication_date': 'publication_date',
-            'authors': 'authors',
-            'publisher': 'publisher',
-            'class_no': 'class_no',
-            'bookImageURL': 'image_url',
-            'description': 'description',
-        }
 
-        return map_dict_to_entity(Book, data, mapping)
+@dataclass
+class PopularLoan:
+    ranking: int
+    name: str
+    authors: str
+    publisher: str
+    publication_year: str
+    isbn13: str
+    vol: str
+    class_no: str
+    loan_count: int
+    image_url: str

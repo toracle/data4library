@@ -2,8 +2,10 @@ import requests
 
 from data4library.utils import to_camel_case
 from data4library.entities import (
+    make_entity,
     Book,
     Library,
+    PopularLoan,
 )
 
 
@@ -30,7 +32,7 @@ class Client:
     def get_libraries(self):
         response = self.send('libSrch')
         return [
-            Library.read(lib['lib'])
+            make_entity(Library, lib['lib'])
             for lib in response['libs']
         ]
 
@@ -38,4 +40,11 @@ class Client:
         response = self.send('srchDtlList',
                              isbn13=isbn13,
                              loaninfoYN='N')
-        return Book.read(response['detail'][0]['book'])
+        return make_entity(Book, response['detail'][0]['book'])
+
+    def get_popular_loans(self):
+        response = self.send('loanItemSrch')
+        return [
+            make_entity(PopularLoan, doc['doc'])
+            for doc in response['docs']
+        ]

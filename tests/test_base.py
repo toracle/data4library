@@ -34,3 +34,14 @@ def test_get_book_detail(requests_mock, client):
     book = client.get_book_detail('9788983921987')
     assert book
     assert book.name == '해리포터와 혼혈왕자'
+
+
+def test_get_popular_loans(requests_mock, client):
+    requests_mock.get(
+        'http://data4library.kr/api/loanItemSrch',
+        text=read_fixture('get_popular_loans_response.txt')
+    )
+
+    loans = client.get_popular_loans()
+    assert loans
+    assert len(loans) == 200
