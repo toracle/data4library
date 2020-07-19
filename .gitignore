@@ -1,0 +1,13 @@
+*.egg-info/
+*.pyc
+.eggs/
+.idea/
+.mypy_cache
+.tox/
+/.coverage
+/coverage.xml
+/report.xml
+__pycache__/
+build/
+dist/
+htmlcov/

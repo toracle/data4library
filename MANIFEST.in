@@ -1,0 +1,2 @@
+include *.rst *.txt *.in data4library/VERSION
+exclude tests
